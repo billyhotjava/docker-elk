@@ -1,14 +1,14 @@
 version: '2'
 
 services:
-    portainer:
-        image: portainer/portainer
-        container_name: alpha-portainer
-        restart: always
-        ports:
-             - 9090:9000
-        volumes:
-             - /var/run/docker.sock:/var/run/docker.sock
+  portainer:
+    image: portainer/portainer
+    container_name: alpha-portainer
+    restart: always
+    ports:
+      - 9090:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
   elasticsearch:
     build:
