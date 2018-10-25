@@ -10,6 +10,19 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  alpha_amp-mariadb:
+    image: mariadb:10.3.7
+    # volumes:
+    #     - ~/volumes/jhipster/alpha_amp/mysql/:/var/lib/mysql/
+    environment:
+        - MYSQL_USER=root
+        - MYSQL_ROOT_PASSWORD=mysql
+        - MYSQL_ALLOW_EMPTY_PASSWORD=no
+        - MYSQL_DATABASE=alpha_amp
+    ports:
+        - 3306:3306
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+
   elasticsearch:
     build:
       context: elasticsearch/
@@ -49,6 +62,19 @@ services:
       - elk
     depends_on:
       - elasticsearch
+
+  alpha_amp-mariadb:
+    image: mariadb:10.3.7
+    # volumes:
+    #     - ~/volumes/jhipster/alpha_amp/mysql/:/var/lib/mysql/
+    environment:
+        - MYSQL_USER=root
+        - MYSQL_ROOT_PASSWORD=mysql
+        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+        - MYSQL_DATABASE=alpha_amp
+    ports:
+        - 3306:3306
+    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
 
 networks:
 
