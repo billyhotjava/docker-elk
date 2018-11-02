@@ -10,19 +10,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  alpha_amp-mariadb:
-    image: mariadb:10.3.7
-    # volumes:
-    #     - ~/volumes/jhipster/alpha_amp/mysql/:/var/lib/mysql/
-    environment:
-        - MYSQL_USER=root
-        - MYSQL_ROOT_PASSWORD=mysql
-        - MYSQL_ALLOW_EMPTY_PASSWORD=no
-        - MYSQL_DATABASE=alpha_amp
-    ports:
-        - 3306:3306
-    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
-
   elasticsearch:
     build:
       context: elasticsearch/
@@ -63,18 +50,42 @@ services:
     depends_on:
       - elasticsearch
 
-  alpha_amp-mariadb:
+  alpha-mariadb:
     image: mariadb:10.3.7
     # volumes:
     #     - ~/volumes/jhipster/alpha_amp/mysql/:/var/lib/mysql/
     environment:
         - MYSQL_USER=root
         - MYSQL_ROOT_PASSWORD=mysql
-        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-        - MYSQL_DATABASE=alpha_amp
+        - MYSQL_ALLOW_EMPTY_PASSWORD=no
+        - MYSQL_DATABASE=alpha-amp
     ports:
         - 3306:3306
     command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+    networks:
+      - elk
+
+  alpha-amp:
+    image: yuzhicloud/alpha-amp
+    container_name: alpha-amp
+    ports:
+      - "8080:8080"
+    environment:
+        - SPRING_DATASOURCE_URL=jdbc:mariadb://alpha-mariadb:3306/alpha-amp
+    networks:
+      - elk
+    depends_on:
+      - alpha-mariadb
+
+  alpha-view:
+    image: yuzhicloud/alpha-view
+    container_name: alpha-view
+    ports:
+      - "80:80"
+    networks:
+      - elk
+    depends_on:
+      - alpha-amp
 
 networks:
 
