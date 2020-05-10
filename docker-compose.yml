@@ -1,93 +1,31 @@
-version: '2'
+version: '3.2'
 
 services:
-  portainer:
-    image: portainer/portainer
-    container_name: alpha-portainer
-    restart: always
-    ports:
-      - 9090:9000
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    portainer:
+        image: portainer/portainer
+        container_name: ws-portainer
+        restart: always
+        ports:
+            - 9095:9000
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
 
-  elasticsearch:
-    build:
-      context: elasticsearch/
-    volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-
-  logstash:
-    build:
-      context: logstash/
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-    ports:
-      - "5000:5000"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
-  kibana:
-    build:
-      context: kibana/
-    volumes:
-      - ./kibana/config/:/usr/share/kibana/config:ro
-    ports:
-      - "5601:5601"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
-
-  alpha-mariadb:
-    image: mariadb:10.3.7
-    # volumes:
-    #     - ~/volumes/jhipster/alpha_amp/mysql/:/var/lib/mysql/
-    environment:
-        - MYSQL_USER=root
-        - MYSQL_ROOT_PASSWORD=mysql
-        - MYSQL_ALLOW_EMPTY_PASSWORD=no
-        - MYSQL_DATABASE=alpha-amp
-    ports:
-        - 3306:3306
-    command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
-    networks:
-      - elk
-
-  alpha-amp:
-    image: yuzhicloud/alpha-amp
-    container_name: alpha-amp
-    ports:
-      - "8080:8080"
-    environment:
-        - SPRING_DATASOURCE_URL=jdbc:mariadb://alpha-mariadb:3306/alpha-amp
-    networks:
-      - elk
-    depends_on:
-      - alpha-mariadb
-
-  alpha-view:
-    image: yuzhicloud/alpha-view
-    container_name: alpha-view
-    ports:
-      - "80:80"
-    networks:
-      - elk
-    depends_on:
-      - alpha-amp
+    siemdemo-mysql:
+        image: mysql:8.0.19
+        # volumes:
+        #     - ~/volumes/jhipster/siemdemo/mysql/:/var/lib/mysql/
+        environment:
+            - MYSQL_USER=root
+            - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+            - MYSQL_DATABASE=siemdemo
+        ports:
+            - 3306:3306
+        command: mysqld --lower_case_table_names=1 --skip-ssl --character_set_server=utf8mb4 --explicit_defaults_for_timestamp
+ 
 
 networks:
+    elk:
+        driver: bridge
 
-  elk:
-    driver: bridge
+volumes:
+    elasticsearch:
